@@ -32,3 +32,4 @@ The non-stationary dynamics are detailed as follows:
 
 ### Visualizations:
 In ``dynamic_visualization.ipynb'', we provide codes to reproduce the sampled dynamics trajectory.
+ 
