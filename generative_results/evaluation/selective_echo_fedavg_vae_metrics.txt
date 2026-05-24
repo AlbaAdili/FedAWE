@@ -1,5 +1,5 @@
 method: selective_echo_fedavg_vae
-loss: 119.2488
-reconstruction_loss: 96.4719
-kl_loss: 22.7769
-diversity_score: 0.113288
+loss: 119.0391
+reconstruction_loss: 96.2196
+kl_loss: 22.8195
+diversity_score: 0.115547
