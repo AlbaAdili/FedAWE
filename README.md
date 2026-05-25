@@ -161,3 +161,5 @@ python generative/fed_vae_awe.py --dataset mnist --rounds 100 --num_clients 20 -
 
 python generative/fed_vae_selective_echo.py --dataset mnist --rounds 100 --num_clients 20 --split dirichlet --alpha 0.1 --availability high_dropout --lambda_stale 0.3 --max_staleness 5
 
+### Sources:
+Our code is adapted from https://github.com/IBM/fedau, which is under MIT License.
