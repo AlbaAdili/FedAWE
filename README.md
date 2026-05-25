@@ -125,3 +125,19 @@ The implemented generative methods are:
 - FashionMNIST (fashionmnist)
 
 ---
+# Availability Dynamics
+
+The original FedAWE dynamics include:
+- stationary
+- sine-based fluctuation
+- staircase fluctuation
+- interleaved sine fluctuation
+
+This project additionally introduces:
+- sudden dropout
+- high dropout
+- severe sparse participation
+
+to stress-test generative stability under non-stationary client participation.
+
+---
