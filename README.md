@@ -150,3 +150,14 @@ to stress-test generative stability under non-stationary client participation.
 python -m main --method fedavg --lr 0.05 --fluctuate 1 --dataset cifar10 --seeds 3,4,6
 
 python -m main --method fedawe --lr 0.1 --fluctuate 1 --dataset cifar10 --seeds 3,4,6
+
+
+---
+# Generative Experiments
+bash
+python generative/fed_vae_avg.py --dataset mnist --rounds 100 --num_clients 20 --split dirichlet --alpha 0.1 --availability high_dropout
+
+python generative/fed_vae_awe.py --dataset mnist --rounds 100 --num_clients 20 --split dirichlet --alpha 0.1 --availability high_dropout
+
+python generative/fed_vae_selective_echo.py --dataset mnist --rounds 100 --num_clients 20 --split dirichlet --alpha 0.1 --availability high_dropout --lambda_stale 0.3 --max_staleness 5
+
