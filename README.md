@@ -66,3 +66,39 @@ We further proposed Selective Echo FedAvg-VAE, which:
 This method significantly improves over vanilla FedAWE-VAE.
 
 ---
+# Key Findings
+
+Our experiments show that:
+
+- FedAWE improves over FedAvg in classification tasks.
+- In generative learning, stale replay updates destabilize VAE latent-space optimization.
+- FedAvg-VAE remains more stable than vanilla FedAWE-VAE.
+- Selective Echo substantially improves stability and generative quality under severe dropout.
+- The same behavior generalizes to FashionMNIST.
+
+---
+
+# Additional Analyses
+
+The project additionally includes:
+- generated image visualization
+- reconstruction analysis
+- diversity evaluation
+- latent-space PCA visualization
+- ablation studies for replay staleness
+- multi-dataset validation
+
+---
+
+# Supported Classification Algorithms
+
+The supported classification algorithms are:
+- FedAvg over active clients (fedavg)
+- FedAvg over all clients (fedall)
+- FedAvg with known probabilities (fedknown)
+- MIFA (mifa)
+- FedAU (fedau)
+- FedVARP (fedvarp)
+- FedAWE (fedawe)
+
+---
