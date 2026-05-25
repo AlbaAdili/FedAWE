@@ -102,3 +102,20 @@ The supported classification algorithms are:
 - FedAWE (fedawe)
 
 ---
+# Supported Generative Algorithms
+
+The implemented generative methods are:
+- Centralized VAE
+- FedAvg-VAE
+- FedAWE-VAE
+- Quality Echo VAE
+- Selective Echo FedAvg-VAE
+
+---
+
+# Supported Datasets
+
+## Classification
+- CIFAR10 (cifar10)
+- SVHN (svhn)
+- CINIC10 (cinic10)
