@@ -119,3 +119,9 @@ The implemented generative methods are:
 - CIFAR10 (cifar10)
 - SVHN (svhn)
 - CINIC10 (cinic10)
+
+## Generative
+- MNIST (mnist)
+- FashionMNIST (fashionmnist)
+
+---
