@@ -18,8 +18,9 @@ def varying_dynamics_awe():
         random.seed(seed)
         np.random.seed(seed)  
         torch.manual_seed(seed) 
-        torch.cuda.manual_seed(seed)  
-        torch.backends.cudnn.deterministic = True  
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed(seed)  
+            torch.backends.cudnn.deterministic = True  
 
         data_train, data_test = load_data(dataset, dataset_file_path, 'cpu')
         data_train_loader = DataLoader(data_train, batch_size=256, shuffle=True, num_workers=0)
@@ -77,19 +78,22 @@ def varying_dynamics_awe():
             accumulated = 0.
             w_accumulate_local = 0.
             w_accumulate_delta = 0.
+            
+            # === 收集本轮数据的临时容器 ===
+            local_deltas = []
+            raw_multipliers = []
+            client_indices = []
 
             for n in range(num_clients):
                 worker_sampler = worker_samplers[n]
 
                 if worker_sampler.sample():
                     participation[n] = True
-                
-                    model.assign_weight(w_local[n].to('cuda'))
+                    model.assign_weight(w_local[n].to(device))
                     model.model.train()
 
                     for i in range(0, 10):
                         images, labels = sample_minibatch(n)
-
                         images, labels = images.to(device), labels.to(device)
 
                         if transform_train is not None:
@@ -101,23 +105,44 @@ def varying_dynamics_awe():
                         loss.backward()                     
                         model.optimizer.step()
                 
-                    w_accumulate_local += w_local[n].to('cuda')
-                    w_accumulate_delta += (model.get_weight() - w_local[n].to('cuda')) * not_participate_count_at_node[n]
+                    w_accumulate_local += w_local[n].to(device)
+                    raw_delta = model.get_weight() - w_local[n].to(device)
+                    
+                    # 缓存本地计算出的梯度和对应的过期倍数
+                    local_deltas.append(raw_delta)
+                    raw_multipliers.append(float(not_participate_count_at_node[n]))
+                    client_indices.append(n)
 
                     accumulated += 1
                     not_participate_count_at_node[n] = 1
-
-                
                 else:
                     participation[n] = False
                     not_participate_count_at_node[n] += 1
 
-
+            # === 【核心修正防御逻辑：1.8倍中位数严格阻击闸门】 ===
             if accumulated > 0:
-                w_global = accumulation(w_accumulate_local,w_accumulate_delta,accumulated,device,lr_global)
+                # 1. 计算本轮所有上线节点梯度的 L2 模长
+                norms = [torch.norm(d).item() for d in local_deltas]
+                median_norm = np.median(norms) if len(norms) > 0 else 0.0
+                
+                # 2. 遍历检查每一个客户端，执行严格防御机制
+                for idx, raw_delta in enumerate(local_deltas):
+                    client_idx = client_indices[idx]
+                    current_norm = norms[idx]
+                    
+                    # 【在这里！】如果该客户端带回来的更新幅度，超过了全网中位数的 1.8 倍
+                    # 判定其大概率发生严重的局部过拟合与客户端漂移（Client Drift）
+                    if current_norm > 1.8 * median_norm and raw_multipliers[idx] > 1.0:
+                        # 剥夺其由于长期掉线获得的过期放大系数，强行退化回 1.0 的经典无偏 FedAvg 系数保护大盘
+                        adaptive_multiplier = 1.0
+                    else:
+                        # 否则判定为在安全范围内的良性加速更新，正常继承原论文的放大红利
+                        adaptive_multiplier = raw_multipliers[idx]
+                        
+                    w_accumulate_delta += raw_delta * adaptive_multiplier
+
+                w_global = accumulation(w_accumulate_local, w_accumulate_delta, accumulated, device, lr_global)
                 accumulated = 0
-            else:
-                pass 
 
             for n in range(num_clients):
                 if participation[n]:
@@ -128,4 +153,5 @@ def varying_dynamics_awe():
             if rounds % eval_freq == 0:
                 stat.collect_stat_eval(seed, rounds, model, data_train_loader, data_test_loader, w_local, w_global)
 
-        torch.cuda.empty_cache()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
