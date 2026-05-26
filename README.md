@@ -1,6 +1,4 @@
 # Federated Generative Learning under Client Unavailability
----
-<img src="https://upload.wikimedia.org/wikipedia/en/thumb/0/08/Logo_for_Conference_on_Neural_Information_Processing_Systems.svg/1200px-Logo_for_Conference_on_Neural_Information_Processing_Systems.svg.png" width=200>
 
 ## Project Overview
 
@@ -150,16 +148,16 @@ to stress-test generative stability under non-stationary client participation.
 python -m main --method fedavg --lr 0.05 --fluctuate 1 --dataset cifar10 --seeds 3,4,6
 
 python -m main --method fedawe --lr 0.1 --fluctuate 1 --dataset cifar10 --seeds 3,4,6
-
+```
 
 ---
 # Generative Experiments
-bash
+```bash
 python generative/fed_vae_avg.py --dataset mnist --rounds 100 --num_clients 20 --split dirichlet --alpha 0.1 --availability high_dropout
 
 python generative/fed_vae_awe.py --dataset mnist --rounds 100 --num_clients 20 --split dirichlet --alpha 0.1 --availability high_dropout
 
 python generative/fed_vae_selective_echo.py --dataset mnist --rounds 100 --num_clients 20 --split dirichlet --alpha 0.1 --availability high_dropout --lambda_stale 0.3 --max_staleness 5
-
+```
 ### Sources:
 Our code is adapted from https://github.com/IBM/fedau, which is under MIT License.
